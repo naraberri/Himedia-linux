@@ -1,0 +1,92 @@
+naver.com
+------------------------------------------------------
+1.접근계정 생성
+2.계정의 홈 디렉토리에 필요한 디렉토리를 세팅
+3.SSH 서버를 활성화
+4.FTP 서버를 활성화
+5.NAME 서버 세팅/활성화
+--------------------------------------------------------
+ROOT에서 해야함
+[계정생성]
+]# useradd naver
+]# passwd naver
+
+[편의 디렉토리 생성]
+]# cd /home/naver
+]# mkdir html
+]# mkdir backup
+
+[소유주 변경] (chown)
+]# chown naver.naver *
+
+[허가권 변경] (chmod)
+]# cd /home
+]# chmod 711 naver
+
+[SSH 활성화]
+]# service sshd restart
+
+[FTP 활성화]
+]# service vsftpd restart
+]# vi /etc/named.conf ;; naver.com의 zone영역설정
+]# cd /var/named
+]# cp named.localhost naver.zone
+]# vi naver.zone
+
+IN SOA @ naver.com. (
+A 내 IP (192.168.19.128)
+
+]# service named restart
+
+]# chown root.named naver.zone
+
+
+-----------------------------------------
+html파일 생성
+알드라이브 접속 --> naver
+혹시 재접속일경우 vi /etc/resolv.conf 에서 nameserver  ip저장
+]# service vsftpd restart
+알드라이브 접속가능
+]# service named restart
+]# ping naver.com 확인
+
+[방화벽 설정]
+]# firewall-cmd --fermanent --add-service=http
+]# firewall-cmd --permanent --add-service=https
+]# firewall-cmd --reload
+]# vi /etc/selinux/config --> SELINUX=disabled
+
+[웹 서버 프로그램 설치]
+]# yum -y install http*
+설치확인
+]# rpm -qa |grep httpd //rpm(배포된 파일)의 모든 것중 httpd가 들어간것
+
+[환경설정 파일] httpd.conf
+]# vi /etc/httpd/conf/httpd.conf
+104번라인 
+Require all denued > Require all granted
+
+[환경설정파일2] vhost.conf
+]# vi /etc/httpd/conf.d/vhost.conf
+
+NameVirtualHost *:80
+<VirtualHost *:80>
+ServerName yahoo.com
+ServerAlias www.yahoo.com
+DocumentRoot /home/yahoo/html
+</VirtualHost>
+
+<VirtualHost *:80>
+ServerName naver.com
+ServerAlias www.naver.com
+DocumentRoot /home/naver/html
+</VirtualHost>
+
+[서버가동]
+]# service named restart
+]# service httpd restart
+
+
+
+
+

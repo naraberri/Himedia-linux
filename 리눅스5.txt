@@ -1,0 +1,203 @@
+[ssh테스트]
+root에서 서버 가동
+vi    /etc/ssh/sshd_config
+:set number
+38행 PermitRootLogin no으로 변경 (#도 제거)
+]# service sshd restart
+
+클라이언트에서 putty로 접근
+1) root로 로그인 시도 (접근 불가)
+2) 일반계정으로 로그인 시도
+=====================================
+윈도우 : 서버
+리눅스 : 접근방법(ssh),파일편집(vi),서버가동
+            네트워크확인(ifconfig,ping,nslookup)
+=====================================
+{ linux.com }
+-index.html
+-boardList.jsp  시나리오
+=====================================
+[서버 관리자]
+1.계정생성 - useradd / passwd
+  -html
+  -n        관리자가 계정의 홈 디렉토리에 만들어줌
+2.ftp가동/ssh가동
+=====================================
+-- 관리자 --
+]# useradd yahoo
+]# passwd yahoo
+]# cd /home
+]# ls ------------------->yahoo
+]# cd yahoo     // ls로 보면 아무것도 없음
+]# mkdir html
+]# mkdir m
+]# mkdir backup ==>ls -l로 확인
+
+소유주를 야후로 바꾸는법
+]# chown yahoo.yahoo  html
+]# chown yahoo.yahoo  m
+]# chown yahoo.yahoo  backup
+]# chown yahoo.yahoo *  모두바꾸기
+(사용자가 사용할 수 있는 상태로 바꿔줌)
+======================================
+[ftp 서버 가동]
+]# service vsftpd restart (실패시 설치안돼있음) 
+]# yum -y install vsftpd* --> 설치
+
+[방화벽 설정]
+]# systemctl enable firewalld
+]# firewall-cmd --permanent --zone=public --add-service=ftp (ftp서비스해주겠다)
+]# firewall-cmd --reload (허가해주기로 재설정)
+
+[업로드/다운로드 관련 파일설정]
+]# vi /etc/selinux/config
+7번 라인 SELINUX = disabled 로 변경(비활성화시킴)
+======================================
+사용준비완료 ==> 서버만 가동하면 됨.
+]# service vsftpd restart ==> OK
+누군가 자료를 올릴 수 있는 상태를 서버에서 만들어줌
+
+(ftp)
+알드라이브 -> 닷홈로그인 -> 사이트맵 -> 호스트에 아이피주소
+-> 아이디 ,비번 yahoo 끗!
+
+html파일 들어가서 업로드 -> 파일 올려놓음
+
+putty yahoo 로그인
+]$ tar cvfz html_20230704_01.tar.gz html
+]$ mv html_tab (누르면 파일명 쫙 나옴) backup
+]$ ls backup로 확인
+
+--------------------------------------------------------
+linux2 계정 생성
+
+]# useradd linux2
+]# passwd linux2
+]# cd /home/linux2
+]# mkdir html
+]# mkdir m
+]# mkdir backup
+]# chown linux2.linux2 *   ip+id+pass 를 들고 ssh,ftp접근 가능
+=======================================
+txt파일로 아무거나 적고
+yahoo에 업로드 
+]# cd /home/yahoo
+]# cp welcome.txt /usr (파일카피)
+]# ls /usr (확인)
+]# vi /etc/vsftpd/vsftpd.conf
+
+마지막줄에 banner_file=/usr/welcome.txt
+]# service vsftpd restart 서버재가동
+알드라이브 옵션 > 환경설정 > 접속 > 창띄우기 > 재접속시 팝업뜸
+==============================================
+오후수업:
+인터넷망
+1.LAN -- 내부 인터넷망
+2.WAN -- 외부 인터넷망
+
+(naver.com)
+pc1 -- 허브장비 -- 라우터장비 -- 광케이블 
+
+pc2 -- 허브장비 -- 라우터장비 -- 네임서버
+
+pc3 -- 허브장비 -- 라우터장비 -- 네임서버
+
+IP주소 세팅법 (window)
+네트워크 연결 > 이더넷상태 > 속성 > IPv4
+
+1.IP주소
+2.GataWay주소 (GW)
+3.DNS주소
+==============================================
+]# nslookup yahoo.com
+]# ping yahoo.com            확인
+
+]# vi /etc/hosts
+IP주소      도메인주소   별칭
+127.0.0.1   yahoo.com yahoo 
+]# ping yahoo.com       ip가 세팅된 127.0.0.1로 찍힘
+]# cat /etc/resolv.conf  --> 내가 사용하는 IP주소
+]# nslookup daum.net --> 서버정보를 알아야겠다.
+
+SSH서버   -> 명령어 실행 및 관리의 목적 1 
+FTP서버    ->자료(업로드/다운로드) 2 
+NAME서버 -> 도메인의 IP주소를 알려주는 목적 3
+WEB서버  -> 홈페이지를 보여주려는 목적 4
+MAIL서버 -> 이메일 목적
+
+==================================
+NAME서버 설치
+]# yum -y install bind*
+]# firewall-cmd --permanent --add-port=53/udp
+]# firewall-cmd --reload     프로그램 설치 및 재시작
+--설정-- 
+두개의 파일을 설정해야함
+]# vi /etc/named.conf
+13번라인 iv주소 127.0.0.1; --> any;
+21번라인 localhost;-->any;
+zone 아래 영역에
+zone "yahoo.com"{
+      type master;
+      file "yahoo.zone";
+      allow-update{none;};
+};
+
+]# cd /var/named
+]# cp named.localhost yahoo.zone
+]# vi yahoo.zone  --> 내 IP주소 세팅
+
+서버 재가동
+]# service named restart
+]# vi /etc/hosts 호스트에서 야후 지우기
+]# vi /etc/resolv.conf 리졸브에 nameserver 내 ip 추가
+(클라이언트에서의 네임서버)
+======================
+정리
+1.환경설정변경
+]# vi /etc/named.conf
+13번라인 iv주소 127.0.0.1; --> any;
+21번라인 localhost;-->any;
+58~ 
+zone "yahoo.com"{
+         type master;
+         file "yahoo.zone";
+         allow-update{none;};
+         };
+
+2.yahoo.zone 영역파일 생성
+]# cd /var/named
+]# cp named.localhost yahoo.zone
+]# vi yahoo.zone 의 A주소 변경
+
+3. 호스트파일 필요없는 내용 삭제
+]# vi /etc/hosts
+
+4.내가 사용하는 네임서버 주소로 바꿈
+]# vi /etc/resolv.conf
+nameserver 192.168....
+
+5.zone파일 소유권
+]# chown root.named /var/named/yahoo.zone
+
+6.서버재가동
+]# service named restart
+
+7.확인
+]# ping yahoo.com
+
+NAME서버 왜?
+
+[내 PC] -> ping yahoo.com(168.111.225.2)
+절차) [내 PC] -> 네임서버에 가서 물어봄 yahoo.com 의 ip??
+	        답 : 168.111.225.2
+========================================
+내 IP
+네임서버 IP
+게이트웨이 IP
+서브넷마스크 IP
+
+내 IP -- 라우트장비 -- 광케이블
+        LAN                   WAN 
+========================================
+real IP 222.12.33.1 (ipv4)
+

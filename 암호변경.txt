@@ -1,0 +1,7 @@
+1. linux 계정의 암호를 재설정
+]$ passwd (로그인된 계정의 암호를 변경)
+linux : leekiyeong
+
+2. root(슈퍼계정)에서 linux 계정의 암호를 변경
+]# passwd linux
+

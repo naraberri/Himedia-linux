@@ -1,0 +1,105 @@
+리눅스
+https://www.centos.org/download/
+x86_64 
+위 5개중에 아무거나
+everything - 2009.iso
+
+vmware window용
+
+vios - vm활성화
+
+vmware 설치
+
+create a new virtual machine
+
+리눅스 iso 선택
+full name  : linux
+user name  : linux
+password : 1234
+next----
+
+f1 : 그래픽화면
+f2~f6 작업환경 (콘솔)
+
+linux(일반유저) --> ]$
+root(슈퍼유저)  --> ]#
+윈도우 	        --> c:/>
+
+]#ls
+]#ls -a
+]#ls -al (목록출력)
+(a는 숨김파일)
+(l은 상세보기)
+허가권  링크숫자  소유주 소유그룹 크기 날짜 이름
+-rw-r--r--   3         root     root      11   
+파일삭제
+rm a.txt 
+디렉토리생성
+]#mkdir abc1
+]#ls -al
+]#mkdir abc2
+]#ls -al
+
+디렉토리 이동
+]#cd abc1
+
+zero파일 생성
+abc1]#touch test1.txt
+abc1]#cd ..
+
+디렉토리 삭제
+]# rmdir abc2
+]#ls -al
+]#rmdir abc1 (내부파일 존재해서 삭제x)
+]#rm -rf abc1 (강제삭제)
+]#ls -al
+
+카피 폴더 파일     가져오기
+]#cp /etc/passwd passwd.txt
+
+파일내용확인 및 파일내용주입 시 사용
+]#cat passwd.txt  
+
+내용주입
+]#cat > test1.txt (enter)
+Lky
+king
+mother
+father
+(ctrl+c)
+]#cat < test1.txt (확인) <생략가능
+
+현재위치 출력
+]#pwd
+/root
+
+]#cd / 
+  (최상위)
+]#ls
+]#pwd
+
+]#ls /etc 환경설정 디렉토리
+]#ls /sbin 명령어 디렉토리
+
+==========허가권 변경===========
+]#cd (enter) 계정의 홈 디렉토리로 이동
+]#touch test11.txt
+]#ls -al
+-rw-r--r-- == rwx ==> r(4) w(2) x(1)
+]#chmod 777 test11.txt
+]#ls -al
+(종류) 소유주 소유그룹 타인
+   -      rwx        rwx     rwx
+ex) -    rwx        rw-     r--
+]#chmod 764 test11.txt
+]#ls -al test11.txt
+
+]#cd /
+]#cp /etc/passwd ./
+]#ls -al passwd
+
+]#chmod 640 passwd
+]#ls -al passwd
+
+]$cat passwd
+  

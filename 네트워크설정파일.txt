@@ -1,0 +1,5 @@
+[네트워크 설정 파일]
+]# cd /etc/sysconfig/network-scripts
+]# ls
+]# vi ifcfg-ens33
+4번째줄 bootproto = "dhcp"
